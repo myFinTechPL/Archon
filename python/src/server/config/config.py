@@ -136,6 +136,10 @@ def validate_supabase_url(url: str) -> bool:
     if parsed.scheme == "http":
         hostname = parsed.hostname or ""
 
+        # Allow HTTP if explicitly enabled (for Docker Compose internal networks)
+        if os.getenv("ALLOW_HTTP_SUPABASE", "").lower() == "true":
+            return True
+
         # Check for exact localhost and Docker internal hosts (security: prevent subdomain bypass)
         local_hosts = ["localhost", "127.0.0.1", "host.docker.internal"]
         if hostname in local_hosts or hostname.endswith(".localhost"):
